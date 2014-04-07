@@ -5,12 +5,14 @@
     var defaults = {
         show_upgrade_messages: true,
         show_line_numbers: false,
-        color1: "#888",
-        color2: "#0563ad"
+        color1: "#888888",
+        color2: "#0563ad",
+        whitelist: '',
+        hosts: []
     };
 
     function getInputs() {
-        var checkboxes = document.querySelectorAll('input');
+        var checkboxes = document.querySelectorAll('input, textarea');
         return Array.prototype.slice.call(checkboxes);
     }
 
@@ -21,40 +23,23 @@
         setTimeout(function() {
             info_div.style.display = "none";
         }, 2500);
-
     }
 
     function saveOptions(e) {
         e.preventDefault();
 
         getInputs().forEach(function(input) {
-            if (input.type == 'text') {
-                localStorage[input.name] = _getColorFromValue(input.value);
-                return;
-            }
-            localStorage[input.name] = input.checked;
+            localStorage[input.name] = input.type == 'checkbox' ? input.checked : input.value;
         });
 
         showMessage('your settings have been saved');
     }
 
-    function _getColorFromValue(value) {
-        if (value.indexOf('#') === 0) {
-            return value;
-        }
-
-        var colors = ['red', 'orange', 'yellow', 'green', 'blue', 'purple', 'pink', 'white', 'black'];
-        if (colors.indexOf(value) !== -1) {
-            return value;
-        }
-
-        return '#' + value;
-    }
-
     function _setInputValue(input, value) {
-        input.value = value.indexOf('#') === 0 ? value.substring(1) : value;
-
-        input.parentNode.querySelector('.swatch').style.background = _getColorFromValue(value);
+        if (input.type === 'color' && !/#\d{6}/.test(value)) {
+            value = defaults[input.name];
+        }
+        input.value = value;
     }
 
     function restoreDefaults(e) {
@@ -65,35 +50,27 @@
 
             localStorage[input.name] = value;
 
-            if (input.type == 'text') {
+            if (input.type == 'checkbox') {
+                input.checked = value;
+            } else {
                 _setInputValue(input, value);
-                return;
             }
-
-            input.checked = value;
         });
 
         showMessage('settings have been restored to the defaults');
     }
 
-    function _handleColorChange(e) {
-        if (e.target.tagName === 'INPUT' && e.target.type == 'text') {
-            _setInputValue(e.target, e.target.value);
-        }
-    }
-
     function init() {
         getInputs().forEach(function(input) {
-            if (input.type == 'text') {
+            if (input.type == 'checkbox') {
+                input.checked = input.name in localStorage ? localStorage[input.name] === "true" : defaults[input.name];
+            } else {
                 _setInputValue(input, input.name in localStorage ? localStorage[input.name] : defaults[input.name]);
-                return;
             }
-            input.checked = input.name in localStorage ? localStorage[input.name] === "true" : defaults[input.name];
         });
 
         document.getElementById('save').addEventListener('click', saveOptions, false);
         document.getElementById('restore').addEventListener('click', restoreDefaults, false);
-        document.addEventListener('input', _handleColorChange, false);
     }
 
     document.addEventListener('DOMContentLoaded', init, false);

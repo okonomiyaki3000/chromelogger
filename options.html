@@ -70,6 +70,13 @@
             margin-bottom: 10px;
         }
 
+        textarea {
+            vertical-align: top;
+            margin-bottom: 10px;
+            width: 100%;
+            resize: vertical;
+        }
+
         .buttons {
             overflow: hidden;
         }
@@ -107,15 +114,21 @@
 
             <label>
                 color 1:
-                <input type="text" name="color1" value=""> <span class="swatch"></span>
+                <input type="color" name="color1" value="">
             </label>
             <p class="info">color used for line numbers</p>
 
             <label>
                 color 2:
-                <input type="text" name="color2" value=""> <span class="swatch"></span>
+                <input type="color" name="color2" value="">
             </label>
             <p class="info">color used for class names</p>
+
+            <label>
+                whitelist:
+                <textarea name="whitelist" rows="10"></textarea>
+            </label>
+            <p class="info">ChromeLogger will be active for domains in this list automatically</p>
 
             <div class="buttons">
                 <button id="save">Save Changes</button>
